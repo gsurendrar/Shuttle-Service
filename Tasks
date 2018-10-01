@@ -1,0 +1,142 @@
+
+Open Page
+
+
+1. Need to have two links :
+
+Admin link 
+
+Associate link
+
+
+
+2. Admin Login 
+
+
+   Add bus
+
+   Delete Bus
+
+   Update existing bus information
+
+   Logout
+
+3. Menu Button
+
+   profile
+   upcoming Journey
+   Cancel Ticket
+   Logout
+
+select * from Bus_avalibility;
++--------+----------+-------------+-----------------+--------------+--------------+-----------------------+
+| Bus_ID | source   | Destination | Date_Of_Journey | Start_Time   | End_Time     | No_Of_Seats_Avaliable |
++--------+----------+-------------+-----------------+--------------+--------------+-----------------------+
+|      1 | SP       | KP          | 2018-09-19      | 10:30:00.000 | 11:30:00.000 |                    28 |
+|      5 | SP       | DP          | 2018-09-20      | 10:30:00.000 | 11:30:00.000 |                    21 |
+|      6 | SP       | Adibatla    | 2018-09-19      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|      7 | DP       | KP          | 2018-09-20      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|      8 | DP       | SP          | 2018-09-19      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|      8 | DP       | Adibatla    | 2018-09-19      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|      9 | KP       | SP          | 2018-09-19      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|     10 | KP       | DP          | 2018-09-21      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|     10 | KP       | Adibatla    | 2018-09-19      | 10:30:00.000 | 11:30:00.000 |                    30 |
+|      2 | Adibatla | SP          | 2018-09-21      | 10:30:00.000 | 11:30:00.000 |                     5 |
+|      3 | Adibatla | KP          | 2018-09-22      | 10:30:00.000 | 11:30:00.000 |                    20 |
+|      4 | Adibatla | DP          | 2018-09-23      | 10:30:00.000 | 11:30:00.000 |                    20 |
+|      1 | SP       | KP          | 2018-09-24      | 10:30:00.000 | 11:30:00.000 |                    18 |
+|      1 | SP       | KP          | 2018-09-24      | 10:30:00.000 | 11:30:00.000 |                    18 |
+|     12 | SP       | KP          | 2018-09-25      | 10:30:00.000 | 11:30:00.000 |                    13 |
+|     13 | SP       | KP          | 2018-09-25      | 11:00:00.000 | 11:30:00.000 |                    18 |
+|     14 | SP       | KP          | 2018-09-26      | 11:00:00.000 | 11:30:00.000 |                    20 |
+|     15 | SP       | KP          | 2018-09-26      | 12:00:00.000 | 12:30:00.000 |                    19 |
+|     20 | SP       | KP          | 2018-09-28      | 12:00:00.000 | 12:30:00.000 |                    20 |
+|     21 | SP       | KP          | 2018-09-28      | 11:00:00.000 | 11:30:00.000 |                    20 |
+|     22 | SP       | KP          | 2018-09-27      | 11:00:00.000 | 11:30:00.000 |                    15 |
+|     23 | SP       | KP          | 2018-09-27      | 11:30:00.000 | 12:30:00.000 |                    20 |
+|     24 | SP       | KP          | 2018-10-01      | 11:30:00.000 | 12:30:00.000 |                    18 |
++--------+----------+-------------+-----------------+--------------+--------------+-----------------------+
+23 rows in set (0.00 sec)
+
+
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser')
+var mysql = require('mysql');
+
+app.get('/', function (req, res) {
+   res.send('Hello World');
+})
+app.use(bodyParser.json());
+ app.listen(8081, function () {
+ 
+   
+   console.log("Example app listening at http://%s:%s")
+})
+
+
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+app.post('/booking', function(req, res) {   
+  console.log("hello");
+ console.log(req.body);
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root123",
+  database:"Bus_Reservation_system"
+});
+
+var source="'"+req.body.Source+"'";
+var destination="'"+req.body.Destination+"'"
+var date="'"+req.body.myDate+"'"
+
+con.connect(function(err) {
+var query='select * from Bus_avalibility where source='+source +'&& Destination='+destination+'&& Date_Of_Journey ='+date
+console.log(query)
+con.query(query, function (err, result, fields) {
+    if (err) throw err;
+console.log("result is");
+    console.log(result);
+res.send(result);
+  });
+  if (err) throw err;
+  console.log("Connected!");
+});
+   
+})
+
+app.post('/updateSeats', function(req, res) {   
+  console.log("hello");
+ console.log(req.body);
+
+//var id="'"+req.body.Source+"'";
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root123",
+  database:"Bus_Reservation_system"
+});
+
+
+con.connect(function(err) {
+  if (err) throw err;
+  var sql = 'UPDATE Bus_avalibility SET No_Of_Seats_Avaliable = No_Of_Seats_Avaliable - 1 WHERE Bus_ID =' +req.body.BusID;
+console.log(sql);
+  con.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log(result.affectedRows + " record(s) updated");
+  });
+});
+});
+
+
+
+
+
+
